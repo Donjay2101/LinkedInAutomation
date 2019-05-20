@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+  <String Id="ProductName_x86">AutoLink(32bit)</String>
+  <String Id="ProductName_x64">AutoLink(64bit)</String>
+  
+  <String Id="ProductName_folder">AutoLink</String>
+  
+  <String Id="Language">1033</String>
+  <String Id="Company">Anvade</String>
+  <String Id="Description">this is to automate linkedin.</String>
+  <String Id="Keywords">LinkedIn,automate,installer,.netcore</String>
+  <String Id="Downgrade_ErrorMessage">A newer version of Autolink is already installed.</String>
+</WixLocalization>

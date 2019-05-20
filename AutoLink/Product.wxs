@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?if $(var.Platform)=x64?>
+    <?define productCode="{90486084-2017-40AB-A761-76554B47B994}"?>
+  <?else?>
+  <?define productCode="{AB02D46A-1E31-4860-9C82-AFF235742CB8}"?>
+  <?endif?>
+  <?define upgradeCode="{269076CB-8C0F-4796-838E-6B5A50A62568}"?>
+  
+	<Product 
+    Id="$(var.productCode)" 
+    Name="!(loc.ProductName_$(var.Platform))" 
+    Language="!(loc.Language)" 
+    Version="$(var.BuildVersion)" 
+    Manufacturer="$(loc.Company)" 
+    UpgradeCode="$(var.upgradeCode)">
+		<Package 
+      InstallerVersion="200" 
+      Compressed="yes" 
+      InstallScope="perMachine" 
+      Platform="$(var.Platform)" 
+      Manufacturer="!(loc.Company)" 
+      Description="!(loc.Description)" 
+      Keywords="!(loc.Keywords)"
+      Languages="!(loc.Language)" />
+		<MajorUpgrade DowngradeErrorMessage="!(loc.Downgrade_ErrorMessage)" />
+		<MediaTemplate EmbedCab="yes" />
+
+    <Icon Id="icon.ico" SourceFile="$(var.LinkedInRequestSolution.ProjectDir)\icon.ico"/>
+    
+    <!--use icon.ico value for this-->
+    <Property Id="ARPPRODUCTICON">icon.ico</Property>
+    <Property Id="ARPURLINFOABOUT">https://github.com/Donjay2101/LinkedList</Property>
+
+    <UIRef Id="WixUI_Minimal"/>
+    
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)\Assets\Background.bmp"/>
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)\Assets\Banner.bmp"/>
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectDir)\Assets\license.rtf"/>
+  
+    
+
+		<Feature Id="ProductFeature" Title="AutoLink" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="PublishComponents" />
+		</Feature>
+	</Product>
+</Wix>

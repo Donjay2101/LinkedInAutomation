@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>3.10</ProductVersion>
+    <ProjectGuid>b7c6f258-0b30-4633-8993-ab1d42329b19</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputName>AutoLink-$(Configuration)-$(Platform)</OutputName>
+    <OutputType>Package</OutputType>
+    <Cultures>;</Cultures>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Debug</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Debug</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ComponentGenerated.wxs" />
+    <Compile Include="Directories.wxs" />
+    <Compile Include="Components.wxs" />
+    <Compile Include="Product.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="common.wxl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\Background.bmp" />
+    <Content Include="Assets\Banner.bmp" />
+    <Content Include="Assets\license.rtf" />
+    <Content Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LinkedInRequestSolution\LinkedInRequestSolution.csproj">
+      <Name>LinkedInRequestSolution</Name>
+      <Project>{b04bdf43-5671-49ef-a056-d0f119cbfc0c}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixUIExtension">
+      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
+      <Name>WixUIExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets" />
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
+  <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
+    <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
+  </Target>
+  <Target Name="BeforeBuild">
+    <!--Remomve folder-->
+    <Exec Command="rd /s /q ..\LinkedInRequestSolution\bin\$(Configuration)\netcoreapp2.1\win-$(Platform)">
+    </Exec>
+    <!--publish folder-->
+    <Exec Command="dotnet publish ..\LinkedInRequestSolution\LinkedInRequestSolution.csproj -c $(Configuration) -r win-$(Platform)">
+    </Exec>
+    <!--Get assembly version-->
+    <GetAssemblyIdentity AssemblyFiles="..\LinkedInRequestSolution\bin\$(Configuration)\netcoreapp2.1\win-$(Platform)\LinkedInRequestSolution.dll">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
+    </GetAssemblyIdentity>
+    <!--Define version here to get in wss file to show.-->
+    <PropertyGroup>
+      <DefineConstants> BuildVersion=%(AssemblyVersion.Version);BasePath=..\LinkedInRequestSolution\bin\$(Configuration)\netcoreapp2.1\win-$(Platform)\publish </DefineConstants>
+    </PropertyGroup>
+    
+    
+    <HeatDirectory 
+      OutputFile="ComponentGenerated.wxs" 
+      DirectoryRefId="INSTALLFOLDER" 
+      ComponentGroupName="PublishComponents" 
+      SuppressCom="true" 
+      Directory="..\LinkedInRequestSolution\bin\$(Configuration)\netcoreapp2.1\win-$(Platform)\publish" 
+      SuppressFragments="true" 
+      SuppressRegistry="true" 
+      SuppressRootDirectory="true" 
+      AutoGenerateGuids="false" 
+      GenerateGuidsNow="true" 
+      ToolPath="$(WixToolPath)" 
+      PreprocessorVariable="var.BasePath"/>
+  </Target>
+
+  <Target Name="AfterBuild">
+    <GetAssemblyIdentity AssemblyFiles="..\LinkedInRequestSolution\bin\$(Configuration)\netcoreapp2.1\win-$(Platform)\LinkedInRequestSolution.dll">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
+    </GetAssemblyIdentity>  
+    <Exec Command="if not exist installs mkdir installs"  />
+    <Exec Command="move bin\$(Configuration)\$(OutputName).msi installs\AutoLink-%(AssemblyVersion.Version)-$(Platform).msi"/>
+  </Target>
+  <!--
+	To modify your build process, add your task inside one of the targets below and uncomment it.
+	Other similar extension points exist, see Wix.targets.
+	<Target Name="BeforeBuild">
+	</Target>
+	<Target Name="AfterBuild">
+	</Target>
+	-->
+</Project>

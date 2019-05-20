@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+
+      <!--<ComponentRef Id="TestFile"  />-->
+      
+      <!--shortcut-->
+      <ComponentRef Id="MainAppShortcut"  />
+    </ComponentGroup>
+
+    <DirectoryRef Id="INSTALLFOLDER" FileSource="..\LinkedInRequestSolution\bin\debug\netcoreapp2.1\win-x86\publish">
+      
+      <!--Shortcut main application-->
+      <Component Id="MainAppShortcut" Guid="{D5570FDB-47B4-402F-93D0-E4F07D28CBDF}">
+
+        <Shortcut Id="MainAppShortcut" 
+                  Name="!(loc.ProductName_$(var.Platform))"
+                  Target="[INSTALLFOLDER]LinkedInRequestSolution.exe"
+                  Directory="InstallProgramfolderMenu"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="icon.ico"/>
+        
+        <!--unique key for shortcut-->
+        <RegistryValue Id="RegShortcutKey" Root="HKCU" Key="SOFTWARE\$(loc.ProductName_folder)" Name="shortcut" Value="1" Type="integer" KeyPath="yes"/>
+        <RemoveFolder Id="Removefolder" Directory="InstallProgramfolderMenu" On="uninstall"/>
+      </Component>
+    </DirectoryRef>
+    
+  </Fragment>
+</Wix>
+ 
