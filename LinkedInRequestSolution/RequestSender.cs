@@ -227,8 +227,12 @@ namespace LinkedInRequestSolution
 
         private void ClickButton(IWebElement item)
         {
-
-            var div = item.FindElement(By.ClassName("search-result__actions"));
+            var divs = item.FindElements(By.ClassName("search-result__actions"));
+            if(divs.Count <= 0)
+            {
+                return;
+            }
+            var div = divs[0];
             var innerHTML = div.GetAttribute("innerHTML");
             var index = innerHTML.IndexOf("premium-upsell-link ember-view");
             if (index <= 0)
