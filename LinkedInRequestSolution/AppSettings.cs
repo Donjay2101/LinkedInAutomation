@@ -10,5 +10,7 @@ namespace LinkedInRequestSolution
         public string Password { get; set; }
         public string Choice { get; set; }
         public string Keyword { get; set; }
+        public string Location { get; set; }
     }
+
 }

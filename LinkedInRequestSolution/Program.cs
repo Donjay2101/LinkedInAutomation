@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace LinkedInRequestSolution
 {
@@ -17,42 +18,23 @@ namespace LinkedInRequestSolution
             var appsettings = GetCredentials();
             if (appsettings == null)
             {
-                Console.WriteLine("enter your registered linked in email ");
-                RequestSender.Instance.Username = Console.ReadLine();
-
-                Console.WriteLine("Enter password");
-                string pass = "";
-                do
-                {
-                    ConsoleKeyInfo key = Console.ReadKey(true);
-                    // Backspace Should Not Work
-                    if (key.Key != ConsoleKey.Backspace && key.Key != ConsoleKey.Enter)
-                    {
-                        pass += key.KeyChar;
-                        Console.Write("*");
-                    }
-                    else
-                    {
-                        if (key.Key == ConsoleKey.Backspace && pass.Length > 0)
-                        {
-                            pass = pass.Substring(0, (pass.Length - 1));
-                            Console.Write("\b \b");
-                        }
-                        else if (key.Key == ConsoleKey.Enter)
-                        {
-                            RequestSender.Instance.Password = pass;
-                            Console.WriteLine("\n");
-                            break;
-                        }
-                    }
-                } while (true);
+                LoginForm();
             }
             else
             {
-                RequestSender.Instance.Username = appsettings.Username;
-                RequestSender.Instance.Password = appsettings.Password;
-                int.TryParse(appsettings.Choice, out _choice);
-                search_word = appsettings.Keyword;
+                if(Regex.IsMatch(appsettings.Username, @"^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
+                {
+                    RequestSender.Instance.Username = appsettings.Username;
+                    RequestSender.Instance.Password = appsettings.Password;
+                    int.TryParse(appsettings.Choice, out _choice);
+                    search_word = appsettings.Keyword;
+                }
+                else
+                {
+                    Console.WriteLine("Username in Appsettings file is not valid email.");
+                    LoginForm();
+                }
+                
             }
 
             if (!(string.IsNullOrWhiteSpace(RequestSender.Instance.Username) && string.IsNullOrWhiteSpace(RequestSender.Instance.Password)))
@@ -85,7 +67,7 @@ namespace LinkedInRequestSolution
                             Console.WriteLine("Enter the search keyword.");
                             search_word = Console.ReadLine();
                         }
-                        RequestSender.Instance.SearchInWeb(search_word);
+                        RequestSender.Instance.SearchInWeb(search_word,appsettings.Location);
                         break;
                     default:
 
@@ -121,6 +103,40 @@ namespace LinkedInRequestSolution
                 }
 
             }
+        }
+
+
+        public static void LoginForm()
+        {
+            Console.WriteLine("enter your registered linked in email ");
+            RequestSender.Instance.Username = Console.ReadLine();
+
+            Console.WriteLine("Enter password");
+            string pass = "";
+            do
+            {
+                ConsoleKeyInfo key = Console.ReadKey(true);
+                // Backspace Should Not Work
+                if (key.Key != ConsoleKey.Backspace && key.Key != ConsoleKey.Enter)
+                {
+                    pass += key.KeyChar;
+                    Console.Write("*");
+                }
+                else
+                {
+                    if (key.Key == ConsoleKey.Backspace && pass.Length > 0)
+                    {
+                        pass = pass.Substring(0, (pass.Length - 1));
+                        Console.Write("\b \b");
+                    }
+                    else if (key.Key == ConsoleKey.Enter)
+                    {
+                        RequestSender.Instance.Password = pass;
+                        Console.WriteLine("\n");
+                        break;
+                    }
+                }
+            } while (true);
         }
     }
 

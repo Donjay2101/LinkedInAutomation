@@ -54,10 +54,7 @@ namespace LinkedInRequestSolution
 
         public void GotoNetworks()
         {
-
             _driver.Navigate().GoToUrl("https://www.linkedin.com/mynetwork/");
-
-            //var div = _driver.FindElementByClassName("core-rail");
         }
 
 
@@ -107,7 +104,7 @@ namespace LinkedInRequestSolution
 
 
 
-        public void SearchInWeb(string serachlabel)
+        public void SearchInWeb(string serachlabel,string location)
         {
             GotoNetworks();
             var search_div = _driver.FindElementById("global-nav-typeahead");
@@ -117,34 +114,41 @@ namespace LinkedInRequestSolution
             search_box.SendKeys(Keys.Enter);
             Thread.Sleep(4000);
             //var ul = _driver.FindElement(By.XPath("//ul[Contians(@class,'search-results__list') and contains(@class,'list-style-none')]"));
-            LocationFilter();
+            LocationFilter(location);
             SendRequest2();
         }
 
-        private void LocationFilter()
+        private void LocationFilter(string location)
         {
-            var locationUl = _driver.FindElement(By.XPath("//ul[contains(@class,'peek-carousel__slides') and contains(@class,'js-list')]"));
-            var li = locationUl.FindElement(By.XPath("//li[contains(@class,'search-s-facet--geoRegion')]"));
-            li.Click();
+            try
+            {
+                var locationUl = _driver.FindElement(By.XPath("//ul[contains(@class,'peek-carousel__slides') and contains(@class,'js-list')]"));
+                var li = locationUl.FindElement(By.XPath("//li[contains(@class,'search-s-facet--geoRegion')]"));
+                li.Click();
 
-            var locationdiv = _driver.FindElement(By.XPath("//div[contains(@class,'type-ahead-wrapper') and contains(@class,'type-ahead-theme-primary') and contains(@class,'simple-type-ahead')]"));
-            var inputText = locationdiv.FindElement(By.TagName("input"));
-            inputText.Clear();
-            inputText.SendKeys("malaysia");
-            var classNames = locationdiv.GetAttribute("class").Split(" ");
-            if (classNames != null && classNames.GetValue(classNames.Length - 1).ToString() == "is-active")
-            {
-                Thread.Sleep(1000);
-                var suggestion_list = locationdiv.FindElement(By.TagName("ul"))
-                    .FindElement(By.TagName("li"));
-                suggestion_list.Click();
+                var locationdiv = _driver.FindElement(By.XPath("//div[contains(@class,'type-ahead-wrapper') and contains(@class,'type-ahead-theme-primary') and contains(@class,'simple-type-ahead')]"));
+                var inputText = locationdiv.FindElement(By.TagName("input"));
+                inputText.Clear();
+                inputText.SendKeys(location);
+                var classNames = locationdiv.GetAttribute("class").Split(" ");
+                if (classNames != null && classNames.GetValue(classNames.Length - 1).ToString() == "is-active")
+                {
+                    Thread.Sleep(1000);
+                    var suggestion_list = locationdiv.FindElement(By.TagName("ul"))
+                        .FindElement(By.TagName("li"));
+                    suggestion_list.Click();
+                }
+                var liist = _driver.FindElements(By.XPath("//fieldset[contains(@class,'search-s-facet__values')]"));
+                if (liist.Count > 0)
+                {
+                    var btn = liist[1].FindElements(By.TagName("button"))[1];
+                    btn.Click();
+                    Thread.Sleep(4000);
+                }
             }
-            var liist = _driver.FindElements(By.XPath("//fieldset[contains(@class,'search-s-facet__values')]"));
-            if (liist.Count > 0)
+            catch(Exception)
             {
-                var btn = liist[1].FindElements(By.TagName("button"))[1];
-                btn.Click();
-                Thread.Sleep(4000);
+                throw;
             }
 
         }
