@@ -118,6 +118,11 @@ namespace LinkedInRequestSolution
             SendRequest2();
         }
 
+
+        private IWebElement FindDivElement()
+        {
+            return _driver.FindElement(By.XPath("//div[contains(@class,'search-basic-typeahead') and contains(@class,'search-vertical-typeahead') and contains(@class,'ember-view')]"));
+        }
         private void LocationFilter(string location)
         {
             try
@@ -126,18 +131,29 @@ namespace LinkedInRequestSolution
                 var li = locationUl.FindElement(By.XPath("//li[contains(@class,'search-s-facet--geoRegion')]"));
                 li.Click();
 
-                var locationdiv = _driver.FindElement(By.XPath("//div[contains(@class,'type-ahead-wrapper') and contains(@class,'type-ahead-theme-primary') and contains(@class,'simple-type-ahead')]"));
+                var locationdiv = FindDivElement();
                 var inputText = locationdiv.FindElement(By.TagName("input"));
                 inputText.Clear();
                 inputText.SendKeys(location);
-                var classNames = locationdiv.GetAttribute("class").Split(" ");
-                if (classNames != null && classNames.GetValue(classNames.Length - 1).ToString() == "is-active")
+                locationdiv = FindDivElement();
+                var locDropdown_list = locationdiv.FindElements(By.XPath("//div[contains(@class,'basic-typeahead__triggered-content') and contains(@class,'search-s-add-facet__typeahead-tray')]"));
+                if (locDropdown_list.Count > 0)
                 {
-                    Thread.Sleep(1000);
-                    var suggestion_list = locationdiv.FindElement(By.TagName("ul"))
-                        .FindElement(By.TagName("li"));
-                    suggestion_list.Click();
+                    var divs = locDropdown_list[0].FindElements(By.TagName("div"));
+                    if(divs.Count>0)
+                    {
+                        divs[2].Click();
+                    }
+                   // Debug.Write(locDropdown_list[0] .GetAttribute("innerHTML"));
                 }
+                //var classNames = locationdiv.GetAttribute("class").Split(" ");
+                //if (classNames != null && classNames.GetValue(classNames.Length - 1).ToString() == "is-active")
+                //{
+                //    Thread.Sleep(1000);
+                //    var suggestion_list = locationdiv.FindElement(By.TagName("ul"))
+                //        .FindElement(By.TagName("li"));
+                //    suggestion_list.Click();
+                //}
                 var liist = _driver.FindElements(By.XPath("//fieldset[contains(@class,'search-s-facet__values')]"));
                 if (liist.Count > 0)
                 {
@@ -146,7 +162,7 @@ namespace LinkedInRequestSolution
                     Thread.Sleep(4000);
                 }
             }
-            catch(Exception)
+            catch
             {
                 throw;
             }
